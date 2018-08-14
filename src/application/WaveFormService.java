@@ -208,7 +208,9 @@ public class WaveFormService extends Service<Boolean> {
 					amplitudes = new int[available];
 					System.out.println("After  decodedFormat");
 					
-					try (AudioInputStream pcmDecodedInput = AudioSystem.getAudioInputStream(decodedFormat, input)) {				
+					System.out.println("Getting Audio Input Stream...");
+					try (AudioInputStream pcmDecodedInput = AudioSystem.getAudioInputStream(decodedFormat, input)) {	
+						System.out.println("Got Audio Input Stream...");
 						byte[] buffer = new byte[available];
 						System.out.println("BEfore read");
 						pcmDecodedInput.read(buffer, 0, available);

@@ -33,7 +33,7 @@ public class Main extends Application {
 			primaryStage.show();
 			
 			//
-			waveVisualization.getWaveService().startService("audio.mp3");
+			waveVisualization.getWaveService().startService("audio/audio.mp3");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
