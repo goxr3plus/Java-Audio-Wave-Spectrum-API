@@ -1,11 +1,11 @@
 # Java-Audio-Wave-Spectrum-API
 Create Wave Spectrum from any Audio File using this API , written in JavaFX
 
-## Platform Support ( 64 bit )
+## Supported Operating Systems
 
-| Operating System | Windows x64,x32 | MacOS x64,x32| Linux x64,x32 |
+| Operating System | Windows x32,x64 | MacOS x32,x64 | Linux x32,x64 |
 | ------- | :-----: | :-: | :-----: |
-| Supported? | YES BOSS | YES BOSS | YES BOSS |
+| Supported? | YES | YES  | YES  |
 
 ## What library are you using for converting the audio to .wav ?
 
@@ -19,5 +19,5 @@ You can see it working live on [XR3Player](https://github.com/goxr3plus/XR3Playe
 
 ![image](https://github.com/goxr3plus/Java-Audio-Wave-Spectrum-API/blob/master/images/Screenshot_1.jpg?raw=true)
 
-# Happy coding madafuckers , any question you have please ask me :) 
+# Ps any question you have please ask :) 
 
