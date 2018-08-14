@@ -19,5 +19,5 @@ You can see it working live on [XR3Player](https://github.com/goxr3plus/XR3Playe
 
 ![image](https://github.com/goxr3plus/Java-Audio-Wave-Spectrum-API/blob/master/images/Screenshot_1.jpg?raw=true)
 
-# Happy coding madafuckers , any question you have please ask me :) 
+# Ps any question you have please ask :) 
 
