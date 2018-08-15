@@ -3,6 +3,7 @@
  */
 package application;
 
+import application.WaveFormService.WaveFormJob;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -29,6 +30,7 @@ public class WaveVisualization extends WaveFormPane {
 	 */
 	public WaveVisualization(int width, int height) {
 		super(width, height);
+		super.setWaveVisualization(this);
 		waveService = new WaveFormService(this);
 		animationService = new PaintService();
 		
@@ -38,7 +40,10 @@ public class WaveVisualization extends WaveFormPane {
 			
 			// Canvas Width
 			this.width = newValue.intValue();
-			recalculateWaveForm = true;
+			
+			//Draw single line :)
+			getWaveService().setResultingWaveform(null);
+			clear();
 			
 		});
 		// -------------
@@ -47,7 +52,10 @@ public class WaveVisualization extends WaveFormPane {
 			
 			// Canvas Height
 			this.height = newValue.intValue();
-			recalculateWaveForm = true;
+			
+			//Draw single line :)
+			getWaveService().setResultingWaveform(null);
+			clear();
 		});
 	}
 	//--------------------------------------------------------------------------------------//
@@ -143,20 +151,19 @@ public class WaveVisualization extends WaveFormPane {
 			//Every 300 millis update
 			if (nanos >= previousNanos + 100000 * 1000) { //
 				previousNanos = nanos;
-				getWaveVisualization().setTimerXPosition(getWaveVisualization().getTimerXPosition() + 1);
+				setTimerXPosition(getTimerXPosition() + 1);
 			}
 			
 			//If resulting wave is not calculated
-			if (getWaveVisualization().getWaveService().getResultingWaveform() == null || getWaveVisualization().recalculateWaveForm) {
-				//System.out.println("Recalculating Resulting Wave Form");
-				getWaveVisualization().getWaveService()
-						.setResultingWaveform(getWaveVisualization().getWaveService().processAmplitudes(getWaveVisualization().getWaveService().getWavAmplitudes()));
-				getWaveVisualization().recalculateWaveForm = false;
+			if (getWaveService().getResultingWaveform() == null) {
+				
+				//Start the Service
+				getWaveService().startService(getWaveService().getFileAbsolutePath(), WaveFormJob.WAVEFORM);
+				return;
 			}
 			
-			//Paint
-			getWaveVisualization().setWaveData(getWaveVisualization().getWaveService().getResultingWaveform());
-			getWaveVisualization().paintWaveForm();
+			//Paint			
+			paintWaveForm();
 		}
 		
 		@Override

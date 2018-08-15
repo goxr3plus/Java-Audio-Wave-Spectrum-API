@@ -38,7 +38,7 @@ public class WaveFormService extends Service<Boolean> {
 	private File temp2;
 	private Encoder encoder;
 	private ConvertProgressListener listener = new ConvertProgressListener();
-	private WaveFormJob waveJob;
+	private WaveFormJob waveFormJob;
 	
 	/**
 	 * Wave Service type of Job ( not boob job ... )
@@ -47,7 +47,7 @@ public class WaveFormService extends Service<Boolean> {
 	 *
 	 */
 	public enum WaveFormJob {
-		AMPLITUDES_AND_AMPLITUDES, WAVEFORM;
+		AMPLITUDES_AND_WAVEFORM, WAVEFORM;
 	}
 	
 	/**
@@ -66,18 +66,21 @@ public class WaveFormService extends Service<Boolean> {
 	 *
 	 * 
 	 */
-	public void startService(String fileAbsolutePath , WaveFormJob waveJob) {
-		
-		//Check if boob job
-		this.waveJob = waveJob;
+	public void startService(String fileAbsolutePath , WaveFormJob waveFormJob) {
+		if (waveFormJob == WaveFormJob.WAVEFORM)
+			cancel();
 		
 		//Stop the Serivce
 		waveVisualization.stopPainterService();
 		
+		//Check if boob job
+		this.waveFormJob = waveFormJob;
+		
 		//Variables
 		this.fileAbsolutePath = fileAbsolutePath;
 		this.resultingWaveform = null;
-		this.wavAmplitudes = null;
+		if (waveFormJob != WaveFormJob.WAVEFORM)
+			this.wavAmplitudes = null;
 		
 		//Go
 		restart();
@@ -88,6 +91,7 @@ public class WaveFormService extends Service<Boolean> {
 	 */
 	// Work done
 	public void done() {
+		waveVisualization.setWaveData(resultingWaveform);
 		waveVisualization.startPainterService();
 		deleteTemporaryFiles();
 	}
@@ -114,11 +118,12 @@ public class WaveFormService extends Service<Boolean> {
 				try {
 					
 					//Calculate 
-					if (waveJob == WaveFormJob.AMPLITUDES_AND_AMPLITUDES) { //AMPLITUDES_AND_AMPLITUDES
+					if (waveFormJob == WaveFormJob.AMPLITUDES_AND_WAVEFORM) { //AMPLITUDES_AND_AMPLITUDES
+						System.out.println("AMPLITUDES_AND_AMPLITUDES");
 						String fileFormat = "mp3";
 						resultingWaveform = processFromNoWavFile(fileFormat);
 						
-					} else if (waveJob == WaveFormJob.WAVEFORM) { //WAVEFORM
+					} else if (waveFormJob == WaveFormJob.WAVEFORM) { //WAVEFORM
 						resultingWaveform = processAmplitudes(wavAmplitudes);
 					}
 				} catch (Exception ex) {
@@ -183,7 +188,7 @@ public class WaveFormService extends Service<Boolean> {
 			 * @throws IOException
 			 */
 			private int[] getWavAmplitudes(File file) throws UnsupportedAudioFileException , IOException {
-				System.out.println("Calculting amplitudes");
+				System.out.println("Calculting WAV amplitudes");
 				int[] amplitudes = null;
 				
 				//Get Audio input stream
@@ -223,7 +228,7 @@ public class WaveFormService extends Service<Boolean> {
 					ex.printStackTrace();
 				}
 				
-				System.out.println("Finished Calculting amplitudes");
+				//System.out.println("Finished Calculting amplitudes");
 				return amplitudes;
 			}
 			
@@ -266,7 +271,7 @@ public class WaveFormService extends Service<Boolean> {
 	 * @return An array with amplitudes
 	 */
 	public float[] processAmplitudes(int[] sourcePcmData) {
-		System.out.println("Processing amplitudes");
+		System.out.println("Processing WAV amplitudes");
 		
 		//The width of the resulting waveform panel
 		int width = waveVisualization.width;

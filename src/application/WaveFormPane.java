@@ -25,6 +25,7 @@ public class WaveFormPane extends ResizableCanvas {
 	int width;
 	int height;
 	private int timerXPosition = 0;
+	private WaveVisualization waveVisualization;
 	
 	/**
 	 * Constructor
@@ -48,7 +49,7 @@ public class WaveFormPane extends ResizableCanvas {
 		
 		backgroundColor = Color.web("#252525");
 		foregroundColor = Color.ORANGE;
-		transparentForeground = Color.rgb((int) (foregroundColor.getRed()*255), (int) (foregroundColor.getGreen()*255), (int) (foregroundColor.getBlue()*255), 0.3);
+		transparentForeground = Color.rgb((int) ( foregroundColor.getRed() * 255 ), (int) ( foregroundColor.getGreen() * 255 ), (int) ( foregroundColor.getBlue() * 255 ), 0.3);
 		
 	}
 	
@@ -86,6 +87,10 @@ public class WaveFormPane extends ResizableCanvas {
 		//Draw a Background Rectangle
 		gc.setFill(backgroundColor);
 		gc.fillRect(0, 0, width, height);
+		
+		//Paint a line
+		gc.setStroke(foregroundColor);
+		gc.strokeLine(0, height / 2, width, height / 2);
 	}
 	
 	/**
@@ -99,12 +104,17 @@ public class WaveFormPane extends ResizableCanvas {
 		
 		//Draw the waveform
 		gc.setStroke(foregroundColor);
-		for (int i = 0; i < waveData.length; i++) {
-			int value = (int) ( waveData[i] * height );
-			int y1 = ( height - 2 * value ) / 2;
-			int y2 = y1 + 2 * value;
-			gc.strokeLine(i, y1, i, y2);
-		}
+		if (waveData != null)
+			for (int i = 0; i < waveData.length; i++) {
+				if (!waveVisualization.getAnimationService().isRunning()) {
+					clear();
+					break;
+				}
+				int value = (int) ( waveData[i] * height );
+				int y1 = ( height - 2 * value ) / 2;
+				int y2 = y1 + 2 * value;
+				gc.strokeLine(i, y1, i, y2);
+			}
 		
 		//Draw a semi transparent Rectangle
 		gc.setFill(transparentForeground);
@@ -113,6 +123,14 @@ public class WaveFormPane extends ResizableCanvas {
 		//Draw an horizontal line
 		gc.setFill(Color.WHITE);
 		gc.fillOval(timerXPosition, 0, 1, height);
+	}
+	
+	public WaveVisualization getWaveVisualization() {
+		return waveVisualization;
+	}
+	
+	public void setWaveVisualization(WaveVisualization waveVisualization) {
+		this.waveVisualization = waveVisualization;
 	}
 	
 }
