@@ -19,6 +19,8 @@ public class WaveVisualization extends WaveFormPane {
 	/*** This Service is creating the wave data for the painter */
 	private final WaveFormService waveService;
 	
+	boolean recalculateWaveForm;
+	
 	/**
 	 * Constructor
 	 * 
@@ -36,6 +38,7 @@ public class WaveVisualization extends WaveFormPane {
 			
 			// Canvas Width
 			this.width = newValue.intValue();
+			recalculateWaveForm = true;
 			
 		});
 		// -------------
@@ -44,6 +47,7 @@ public class WaveVisualization extends WaveFormPane {
 			
 			// Canvas Height
 			this.height = newValue.intValue();
+			recalculateWaveForm = true;
 		});
 	}
 	//--------------------------------------------------------------------------------------//
@@ -138,8 +142,15 @@ public class WaveVisualization extends WaveFormPane {
 				WaveVisualization.this.setTimerXPosition(WaveVisualization.this.getTimerXPosition() + 1);
 			}
 			
+			//If resulting wave is not calculated
+			if (WaveVisualization.this.getWaveService().getResultingWaveform() == null || WaveVisualization.this.recalculateWaveForm) {
+				System.out.println("Calculating Resulting Wave Form");
+				WaveVisualization.this.getWaveService().setResultingWaveform(processAmplitudes(WaveVisualization.this.getWaveService().getWavAmplitudes()));
+				WaveVisualization.this.recalculateWaveForm = false;
+			}
+			
 			//Paint
-			WaveVisualization.this.setWaveData(processAmplitudes(WaveVisualization.this.getWaveService().getWavAmplitudes()));
+			WaveVisualization.this.setWaveData(WaveVisualization.this.getWaveService().getResultingWaveform());
 			WaveVisualization.this.paintWaveForm();
 		}
 		

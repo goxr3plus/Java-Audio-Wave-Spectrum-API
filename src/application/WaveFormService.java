@@ -27,7 +27,7 @@ import ws.schild.jave.MultimediaObject;
 
 public class WaveFormService extends Service<Boolean> {
 	
-	private static final double WAVEFORM_HEIGHT_COEFFICIENT = 2.4; // This fits the waveform to the swing node height
+	private static final double WAVEFORM_HEIGHT_COEFFICIENT = 2.5; // This fits the waveform to the swing node height
 	private static final CopyOption[] options = new CopyOption[]{ COPY_ATTRIBUTES , REPLACE_EXISTING };
 	private float[] resultingWaveform;
 	private int[] wavAmplitudes;
@@ -194,8 +194,8 @@ public class WaveFormService extends Service<Boolean> {
 			private int[] getWavAmplitudes(File file) throws UnsupportedAudioFileException , IOException {
 				System.out.println("Calculting amplitudes");
 				int[] amplitudes = null;
-				double fixer = WAVEFORM_HEIGHT_COEFFICIENT;//4 / 100.00 * waveVisualization.height;
-				System.out.println("fixer :" + fixer);
+				
+				//Get Audio input stream
 				try (AudioInputStream input = AudioSystem.getAudioInputStream(file)) {
 					AudioFormat baseFormat = input.getFormat();
 					
@@ -206,24 +206,23 @@ public class WaveFormService extends Service<Boolean> {
 					AudioFormat decodedFormat = new AudioFormat(encoding, sampleRate, 16, numChannels, numChannels * 2, sampleRate, false);
 					int available = input.available();
 					amplitudes = new int[available];
-					System.out.println("After  decodedFormat");
 					
-					System.out.println("Getting Audio Input Stream...");
+					//Get the PCM Decoded Audio Input Stream
 					try (AudioInputStream pcmDecodedInput = AudioSystem.getAudioInputStream(decodedFormat, input)) {
-						System.out.println("Got Audio Input Stream...");
-						System.out.println("Available ... " + available + " bigger than max: " + ( available >= Byte.MAX_VALUE ));
-						System.out.println("Creating byte array...");
-						byte[] buffer = new byte[available];
-						System.out.println("Creating byte array...");
-						System.out.println("BEfore read");
-						pcmDecodedInput.read(buffer, 0, available);
-						System.out.println("After read");
-						for (int i = 0; i < available - 1; i += 2) {
-							//System.out.println("Inside Loop");
-							amplitudes[i] = ( ( buffer[i + 1] << 8 ) | buffer[i] & 0xff ) << 16;
-							amplitudes[i] /= 32767;
-							amplitudes[i] *= fixer;
-							
+						final int BUFFER_SIZE = 4096; //this is actually bytes
+						System.out.println(available);
+						
+						//Create a buffer
+						byte[] buffer = new byte[BUFFER_SIZE];
+						
+						//Read all the available data on chunks
+						int counter = 0;
+						while (pcmDecodedInput.readNBytes(buffer, 0, BUFFER_SIZE) > 0) {
+							for (int i = 0; i < buffer.length - 1; i += 2, counter += 2) {
+								amplitudes[counter] = ( ( buffer[i + 1] << 8 ) | buffer[i] & 0xff ) << 16;
+								amplitudes[counter] /= 32767;
+								amplitudes[counter] *= WAVEFORM_HEIGHT_COEFFICIENT;
+							}
 						}
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -320,6 +319,14 @@ public class WaveFormService extends Service<Boolean> {
 	
 	public int[] getWavAmplitudes() {
 		return wavAmplitudes;
+	}
+
+	public float[] getResultingWaveform() {
+		return resultingWaveform;
+	}
+
+	public void setResultingWaveform(float[] resultingWaveform) {
+		this.resultingWaveform = resultingWaveform;
 	}
 	
 }
