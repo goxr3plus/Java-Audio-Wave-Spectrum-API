@@ -1,5 +1,6 @@
 package application;
 
+import application.WaveFormService.WaveFormJob;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -33,7 +34,7 @@ public class Main extends Application {
 			primaryStage.show();
 			
 			//
-			waveVisualization.getWaveService().startService("audio/bigAudio.mp3");
+			waveVisualization.getWaveService().startService("audio/bigAudio.mp3",WaveFormJob.AMPLITUDES_AND_AMPLITUDES);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

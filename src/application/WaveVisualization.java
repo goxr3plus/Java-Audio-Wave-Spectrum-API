@@ -19,7 +19,7 @@ public class WaveVisualization extends WaveFormPane {
 	/*** This Service is creating the wave data for the painter */
 	private final WaveFormService waveService;
 	
-	boolean recalculateWaveForm;
+	private boolean recalculateWaveForm;
 	
 	/**
 	 * Constructor
@@ -34,7 +34,7 @@ public class WaveVisualization extends WaveFormPane {
 		
 		// ----------
 		widthProperty().addListener((observable , oldValue , newValue) -> {
-			System.out.println("New Visualizer Width is:" + newValue);
+			//System.out.println("New Visualizer Width is:" + newValue);
 			
 			// Canvas Width
 			this.width = newValue.intValue();
@@ -43,7 +43,7 @@ public class WaveVisualization extends WaveFormPane {
 		});
 		// -------------
 		heightProperty().addListener((observable , oldValue , newValue) -> {
-			System.out.println("New Visualizer Height is:" + newValue);
+			//System.out.println("New Visualizer Height is:" + newValue);
 			
 			// Canvas Height
 			this.height = newValue.intValue();
@@ -132,6 +132,10 @@ public class WaveVisualization extends WaveFormPane {
 			drawEnabled = enabled;
 		}
 		
+		public WaveVisualization getWaveVisualization() {
+			return WaveVisualization.this;
+		}
+		
 		@Override
 		public void handle(long nanos) {
 			//System.out.println("Running...")
@@ -139,42 +143,20 @@ public class WaveVisualization extends WaveFormPane {
 			//Every 300 millis update
 			if (nanos >= previousNanos + 100000 * 1000) { //
 				previousNanos = nanos;
-				WaveVisualization.this.setTimerXPosition(WaveVisualization.this.getTimerXPosition() + 1);
+				getWaveVisualization().setTimerXPosition(getWaveVisualization().getTimerXPosition() + 1);
 			}
 			
 			//If resulting wave is not calculated
-			if (WaveVisualization.this.getWaveService().getResultingWaveform() == null || WaveVisualization.this.recalculateWaveForm) {
-				System.out.println("Calculating Resulting Wave Form");
-				WaveVisualization.this.getWaveService().setResultingWaveform(processAmplitudes(WaveVisualization.this.getWaveService().getWavAmplitudes()));
-				WaveVisualization.this.recalculateWaveForm = false;
+			if (getWaveVisualization().getWaveService().getResultingWaveform() == null || getWaveVisualization().recalculateWaveForm) {
+				//System.out.println("Recalculating Resulting Wave Form");
+				getWaveVisualization().getWaveService()
+						.setResultingWaveform(getWaveVisualization().getWaveService().processAmplitudes(getWaveVisualization().getWaveService().getWavAmplitudes()));
+				getWaveVisualization().recalculateWaveForm = false;
 			}
 			
 			//Paint
-			WaveVisualization.this.setWaveData(WaveVisualization.this.getWaveService().getResultingWaveform());
-			WaveVisualization.this.paintWaveForm();
-		}
-		
-		/**
-		 * Process the amplitudes
-		 * 
-		 * @param sourcePcmData
-		 * @return An array with amplitudes
-		 */
-		private float[] processAmplitudes(int[] sourcePcmData) {
-			int width = WaveVisualization.this.width;    // the width of the resulting waveform panel
-			float[] waveData = new float[width];
-			int samplesPerPixel = sourcePcmData.length / width;
-			
-			for (int w = 0; w < width; w++) {
-				float nValue = 0.0f;
-				
-				for (int s = 0; s < samplesPerPixel; s++) {
-					nValue += ( Math.abs(sourcePcmData[w * samplesPerPixel + s]) / 65536.0f );
-				}
-				nValue /= samplesPerPixel;
-				waveData[w] = nValue;
-			}
-			return waveData;
+			getWaveVisualization().setWaveData(getWaveVisualization().getWaveService().getResultingWaveform());
+			getWaveVisualization().paintWaveForm();
 		}
 		
 		@Override
