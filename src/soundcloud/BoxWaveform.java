@@ -80,9 +80,9 @@ public class BoxWaveform {
 			if (boxWidth == 1) {
 				g2d.drawLine(x, posY, x, negY);
 			} else {
-				g2d.setColor(Color.black);
+				g2d.setColor(Color.GRAY);
 				g2d.fillRect(x + 1, posY + 1, boxWidth - 1, negY - posY - 1);
-				g2d.setColor(Color.ORANGE);
+				g2d.setColor(Color.DARK_GRAY);
 				g2d.drawRect(x, posY, boxWidth, negY - posY);
 			}
 		}
@@ -124,6 +124,7 @@ public class BoxWaveform {
 			
 			int i = 0;
 			int bRead;
+			System.out.println(samples.length);
 			while ( ( bRead = in.read(buf) ) > -1) {
 				
 				for (int b = 0; b < bRead;) {

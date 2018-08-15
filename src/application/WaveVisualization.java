@@ -20,7 +20,7 @@ public class WaveVisualization extends WaveFormPane {
 	/*** This Service is creating the wave data for the painter */
 	private final WaveFormService waveService;
 	
-	private boolean recalculateWaveForm;
+	private boolean recalculateWaveData;
 	
 	/**
 	 * Constructor
@@ -36,13 +36,13 @@ public class WaveVisualization extends WaveFormPane {
 		
 		// ----------
 		widthProperty().addListener((observable , oldValue , newValue) -> {
-			System.out.println("New Visualizer Width is:" + newValue);
+			//System.out.println("New Visualizer Width is:" + newValue);
 			
 			// Canvas Width
 			this.width = Math.round(newValue.floatValue());
 			
 			//Draw single line :)
-			recalculateWaveForm = true;
+			recalculateWaveData = true;
 			clear();
 			
 		});
@@ -54,9 +54,14 @@ public class WaveVisualization extends WaveFormPane {
 			this.height = Math.round(newValue.floatValue());
 			
 			//Draw single line :)
-			recalculateWaveForm = true;
+			recalculateWaveData = true;
 			clear();
 		});
+		
+		//Tricky mouse events
+		setOnMouseMoved(m -> this.setMouseXPosition((int) m.getX()));
+		setOnMouseExited(m -> this.setMouseXPosition(-1));
+		
 	}
 	//--------------------------------------------------------------------------------------//
 	
@@ -116,9 +121,6 @@ public class WaveVisualization extends WaveFormPane {
 		/*** When this property is <b>true</b> the AnimationTimer is running */
 		private volatile SimpleBooleanProperty running = new SimpleBooleanProperty(false);
 		
-		/*** The animationService can draw */
-		private boolean drawEnabled = true;
-		
 		private long previousNanos = 0;
 		
 		@Override
@@ -129,15 +131,6 @@ public class WaveVisualization extends WaveFormPane {
 			
 			super.start();
 			running.set(true);
-		}
-		
-		/**
-		 * If draw is false , nothing will be drawn
-		 * 
-		 * @param enabled
-		 */
-		public void setDrawEnabled(boolean enabled) {
-			drawEnabled = enabled;
 		}
 		
 		public WaveVisualization getWaveVisualization() {
@@ -155,11 +148,11 @@ public class WaveVisualization extends WaveFormPane {
 			}
 			
 			//If resulting wave is not calculated
-			if (getWaveService().getResultingWaveform() == null || recalculateWaveForm) {
+			if (getWaveService().getResultingWaveform() == null || recalculateWaveData) {
 				
 				//Start the Service
 				getWaveService().startService(getWaveService().getFileAbsolutePath(), WaveFormJob.WAVEFORM);
-				recalculateWaveForm = false;
+				recalculateWaveData = false;
 				
 				return;
 			}

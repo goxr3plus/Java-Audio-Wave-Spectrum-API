@@ -1,11 +1,3 @@
-/*
- * This file is part of Musicott software. Musicott software is free software: you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * Musicott library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public
- * License along with Musicott. If not, see <http://www.gnu.org/licenses/>. Copyright (C) 2015 - 2017 Octavio Calleya
- */
-
 package application;
 
 import javafx.scene.paint.Color;
@@ -22,9 +14,11 @@ public class WaveFormPane extends ResizableCanvas {
 	private Color backgroundColor;
 	private Color foregroundColor;
 	private Color transparentForeground;
+	private Color mouseXColor = Color.rgb(255, 255, 255, 0.7);
 	int width;
 	int height;
 	private int timerXPosition = 0;
+	private int mouseXPosition = -1;
 	private WaveVisualization waveVisualization;
 	
 	/**
@@ -48,8 +42,7 @@ public class WaveFormPane extends ResizableCanvas {
 		waveData = defaultWave;
 		
 		backgroundColor = Color.web("#252525");
-		foregroundColor = Color.ORANGE;
-		transparentForeground = Color.rgb((int) ( foregroundColor.getRed() * 255 ), (int) ( foregroundColor.getGreen() * 255 ), (int) ( foregroundColor.getBlue() * 255 ), 0.3);
+		setForeground(foregroundColor);
 		
 	}
 	
@@ -64,6 +57,7 @@ public class WaveFormPane extends ResizableCanvas {
 	
 	public void setForeground(Color color) {
 		this.foregroundColor = color;
+		transparentForeground = Color.rgb((int) ( foregroundColor.getRed() * 255 ), (int) ( foregroundColor.getGreen() * 255 ), (int) ( foregroundColor.getBlue() * 255 ), 0.3);
 	}
 	
 	public void setBackgroundColor(Color color) {
@@ -76,6 +70,10 @@ public class WaveFormPane extends ResizableCanvas {
 	
 	public void setTimerXPosition(int timerXPosition) {
 		this.timerXPosition = timerXPosition;
+	}
+	
+	public void setMouseXPosition(int mouseXPosition) {
+		this.mouseXPosition = mouseXPosition;
 	}
 	
 	/**
@@ -123,6 +121,12 @@ public class WaveFormPane extends ResizableCanvas {
 		//Draw an horizontal line
 		gc.setFill(Color.WHITE);
 		gc.fillOval(timerXPosition, 0, 1, height);
+		
+		//Draw an horizontal line
+		if (mouseXPosition != -1) {
+			gc.setFill(mouseXColor);
+			gc.fillRect(mouseXPosition, 0, 3, height);
+		}
 	}
 	
 	public WaveVisualization getWaveVisualization() {

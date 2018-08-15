@@ -34,7 +34,7 @@ public class Main extends Application {
 			primaryStage.show();
 			
 			//
-			waveVisualization.getWaveService().startService("audio/bigAudio.mp3",WaveFormJob.AMPLITUDES_AND_WAVEFORM);
+			waveVisualization.getWaveService().startService("audio/audio.mp3",WaveFormJob.AMPLITUDES_AND_WAVEFORM);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
