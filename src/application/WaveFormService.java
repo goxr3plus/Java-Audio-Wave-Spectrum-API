@@ -72,11 +72,11 @@ public class WaveFormService extends Service<Boolean> {
 		waveVisualization.startPainterService();
 		//	waveVisualization.setWaveData(resultingWaveform)
 		//	waveVisualization.paintWaveForm()
-		//deleteTemporaryFiles();
+		deleteTemporaryFiles();
 	}
 	
 	private void failure() {
-		//deleteTemporaryFiles();
+		deleteTemporaryFiles();
 	}
 	
 	/**
@@ -151,8 +151,8 @@ public class WaveFormService extends Service<Boolean> {
 					wavAmplitudes = getWavAmplitudes(temporalDecodedFile);
 				
 				//Delete temporary files
-				//temporalDecodedFile.delete();
-				//temporalCopiedFile.delete();
+				temporalDecodedFile.delete();
+				temporalCopiedFile.delete();
 				
 				return processAmplitudes(wavAmplitudes);
 			}
