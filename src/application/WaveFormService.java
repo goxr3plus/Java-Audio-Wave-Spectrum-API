@@ -72,11 +72,11 @@ public class WaveFormService extends Service<Boolean> {
 		waveVisualization.startPainterService();
 		//	waveVisualization.setWaveData(resultingWaveform)
 		//	waveVisualization.paintWaveForm()
-		deleteTemporaryFiles();
+		//deleteTemporaryFiles();
 	}
 	
 	private void failure() {
-		deleteTemporaryFiles();
+		//deleteTemporaryFiles();
 	}
 	
 	/**
@@ -151,8 +151,8 @@ public class WaveFormService extends Service<Boolean> {
 					wavAmplitudes = getWavAmplitudes(temporalDecodedFile);
 				
 				//Delete temporary files
-				temporalDecodedFile.delete();
-				temporalCopiedFile.delete();
+				//temporalDecodedFile.delete();
+				//temporalCopiedFile.delete();
 				
 				return processAmplitudes(wavAmplitudes);
 			}
@@ -209,9 +209,12 @@ public class WaveFormService extends Service<Boolean> {
 					System.out.println("After  decodedFormat");
 					
 					System.out.println("Getting Audio Input Stream...");
-					try (AudioInputStream pcmDecodedInput = AudioSystem.getAudioInputStream(decodedFormat, input)) {	
+					try (AudioInputStream pcmDecodedInput = AudioSystem.getAudioInputStream(decodedFormat, input)) {
 						System.out.println("Got Audio Input Stream...");
+						System.out.println("Available ... " + available + " bigger than max: " + ( available >= Byte.MAX_VALUE ));
+						System.out.println("Creating byte array...");
 						byte[] buffer = new byte[available];
+						System.out.println("Creating byte array...");
 						System.out.println("BEfore read");
 						pcmDecodedInput.read(buffer, 0, available);
 						System.out.println("After read");
@@ -222,10 +225,10 @@ public class WaveFormService extends Service<Boolean> {
 							amplitudes[i] *= fixer;
 							
 						}
-					}catch(Exception ex) {
+					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
-				}catch(Exception ex) {
+				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 				System.out.println("Finished Calculting amplitudes");
