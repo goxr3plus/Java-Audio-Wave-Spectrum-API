@@ -36,13 +36,13 @@ public class WaveVisualization extends WaveFormPane {
 		
 		// ----------
 		widthProperty().addListener((observable , oldValue , newValue) -> {
-			//System.out.println("New Visualizer Width is:" + newValue);
+			System.out.println("New Visualizer Width is:" + newValue);
 			
 			// Canvas Width
-			this.width = newValue.intValue();
+			this.width = Math.round(newValue.floatValue());
 			
 			//Draw single line :)
-			getWaveService().setResultingWaveform(null);
+			recalculateWaveForm = true;
 			clear();
 			
 		});
@@ -51,10 +51,10 @@ public class WaveVisualization extends WaveFormPane {
 			//System.out.println("New Visualizer Height is:" + newValue);
 			
 			// Canvas Height
-			this.height = newValue.intValue();
+			this.height = Math.round(newValue.floatValue());
 			
 			//Draw single line :)
-			getWaveService().setResultingWaveform(null);
+			recalculateWaveForm = true;
 			clear();
 		});
 	}
@@ -155,10 +155,12 @@ public class WaveVisualization extends WaveFormPane {
 			}
 			
 			//If resulting wave is not calculated
-			if (getWaveService().getResultingWaveform() == null) {
+			if (getWaveService().getResultingWaveform() == null || recalculateWaveForm) {
 				
 				//Start the Service
 				getWaveService().startService(getWaveService().getFileAbsolutePath(), WaveFormJob.WAVEFORM);
+				recalculateWaveForm = false;
+				
 				return;
 			}
 			

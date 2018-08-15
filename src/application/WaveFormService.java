@@ -104,8 +104,10 @@ public class WaveFormService extends Service<Boolean> {
 	 * Delete temporary files
 	 */
 	private void deleteTemporaryFiles() {
-		temp1.delete();
-		temp2.delete();
+		if (temp1 != null && temp2 != null) {
+			temp1.delete();
+			temp2.delete();
+		}
 	}
 	
 	@Override
@@ -128,6 +130,9 @@ public class WaveFormService extends Service<Boolean> {
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
+					if (ex.getMessage().contains("There is not enough space on the disk")) {
+						System.err.println("Not enough disk space");
+					}
 					return false;
 				}
 				
@@ -177,6 +182,36 @@ public class WaveFormService extends Service<Boolean> {
 				temporalCopiedFile.delete();
 				
 				return processAmplitudes(wavAmplitudes);
+			}
+			
+			/**
+			 * Transcode to Wav
+			 * 
+			 * @param sourceFile
+			 * @param destinationFile
+			 * @throws EncoderException
+			 */
+			private void transcodeToWav(File sourceFile , File destinationFile) throws EncoderException {
+				//Attributes atters = DefaultAttributes.WAV_PCM_S16LE_STEREO_44KHZ.getAttributes()
+				try {
+					
+					//Set Audio Attributes
+					AudioAttributes audio = new AudioAttributes();
+					audio.setCodec("pcm_s16le");
+					audio.setChannels(2);
+					audio.setSamplingRate(44100);
+					
+					//Set encoding attributes
+					EncodingAttributes attributes = new EncodingAttributes();
+					attributes.setFormat("wav");
+					attributes.setAudioAttributes(audio);
+					
+					//Encode
+					encoder = encoder != null ? encoder : new Encoder();
+					encoder.encode(new MultimediaObject(sourceFile), destinationFile, attributes, listener);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 			
 			/**
@@ -233,70 +268,45 @@ public class WaveFormService extends Service<Boolean> {
 			}
 			
 			/**
-			 * Transcode to Wav
+			 * Process the amplitudes
 			 * 
-			 * @param sourceFile
-			 * @param destinationFile
-			 * @throws EncoderException
+			 * @param sourcePcmData
+			 * @return An array with amplitudes
 			 */
-			private void transcodeToWav(File sourceFile , File destinationFile) throws EncoderException {
-				//Attributes atters = DefaultAttributes.WAV_PCM_S16LE_STEREO_44KHZ.getAttributes()
-				try {
+			private float[] processAmplitudes(int[] sourcePcmData) {
+				System.out.println("Processing WAV amplitudes");
+				
+				//The width of the resulting waveform panel
+				int width = waveVisualization.width;
+				System.out.println("P Width :" + width);
+				float[] waveData = new float[width];
+				int samplesPerPixel = sourcePcmData.length / width;
+				
+				//Calculate
+				float nValue;
+				for (int w = 0; w < width; w++) {
+					//if (isCancelled())
+					//	break;
 					
-					//Set Audio Attributes
-					AudioAttributes audio = new AudioAttributes();
-					audio.setCodec("pcm_s16le");
-					audio.setChannels(2);
-					audio.setSamplingRate(44100);
+					//For performance keep it here
+					int c = w * samplesPerPixel;
+					nValue = 0.0f;
 					
-					//Set encoding attributes
-					EncodingAttributes attributes = new EncodingAttributes();
-					attributes.setFormat("wav");
-					attributes.setAudioAttributes(audio);
+					//Keep going
+					for (int s = 0; s < samplesPerPixel; s++) {
+						//if (isCancelled())
+						//	break;
+						nValue += ( Math.abs(sourcePcmData[c + s]) / 65536.0f );
+					}
 					
-					//Encode
-					encoder = encoder != null ? encoder : new Encoder();
-					encoder.encode(new MultimediaObject(sourceFile), destinationFile, attributes, listener);
-				} catch (Exception ex) {
-					ex.printStackTrace();
+					//Set WaveData
+					waveData[w] = nValue / samplesPerPixel;
 				}
+				
+				System.out.println("Finished Processing amplitudes");
+				return waveData;
 			}
 		};
-	}
-	
-	/**
-	 * Process the amplitudes
-	 * 
-	 * @param sourcePcmData
-	 * @return An array with amplitudes
-	 */
-	public float[] processAmplitudes(int[] sourcePcmData) {
-		System.out.println("Processing WAV amplitudes");
-		
-		//The width of the resulting waveform panel
-		int width = waveVisualization.width;
-		float[] waveData = new float[width];
-		int samplesPerPixel = sourcePcmData.length / width;
-		
-		//Calculate
-		float nValue;
-		for (int w = 0; w < width; w++) {
-			
-			//For performance keep it here
-			int c = w * samplesPerPixel;
-			nValue = 0.0f;
-			
-			//Keep going
-			for (int s = 0; s < samplesPerPixel; s++) {
-				nValue += ( Math.abs(sourcePcmData[c + s]) / 65536.0f );
-			}
-			
-			//Set WaveData
-			waveData[w] = nValue / samplesPerPixel;
-		}
-		
-		System.out.println("Finished Processing amplitudes");
-		return waveData;
 	}
 	
 	public class ConvertProgressListener implements EncoderProgressListener {
