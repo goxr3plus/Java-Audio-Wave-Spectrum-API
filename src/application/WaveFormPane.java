@@ -42,7 +42,7 @@ public class WaveFormPane extends ResizableCanvas {
 		waveData = defaultWave;
 		
 		backgroundColor = Color.web("#252525");
-		setForeground(foregroundColor);
+		setForeground(Color.ORANGERED);
 		
 	}
 	
