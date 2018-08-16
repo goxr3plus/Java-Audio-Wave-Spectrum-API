@@ -285,8 +285,6 @@ public class WaveFormService extends Service<Boolean> {
 				//Calculate
 				float nValue;
 				for (int w = 0; w < width; w++) {
-					//if (isCancelled())
-					//	break;
 					
 					//For performance keep it here
 					int c = w * samplesPerPixel;
@@ -294,8 +292,6 @@ public class WaveFormService extends Service<Boolean> {
 					
 					//Keep going
 					for (int s = 0; s < samplesPerPixel; s++) {
-						//if (isCancelled())
-						//	break;
 						nValue += ( Math.abs(sourcePcmData[c + s]) / 65536.0f );
 					}
 					
