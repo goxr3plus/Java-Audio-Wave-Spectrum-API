@@ -78,7 +78,7 @@ public class WaveFormService extends Service<Boolean> {
 		
 		//Variables
 		this.fileAbsolutePath = fileAbsolutePath;
-		this.resultingWaveform = null;
+		//this.resultingWaveform = null;
 		if (waveFormJob != WaveFormJob.WAVEFORM)
 			this.wavAmplitudes = null;
 		
@@ -245,7 +245,7 @@ public class WaveFormService extends Service<Boolean> {
 						byte[] buffer = new byte[BUFFER_SIZE];
 						
 						//Now get the average to a smaller array
-						int maximumArrayLength = 40000;
+						int maximumArrayLength = 100000;
 						int[] finalAmplitudes = new int[maximumArrayLength];
 						int samplesPerPixel = available / maximumArrayLength;
 						
@@ -255,12 +255,11 @@ public class WaveFormService extends Service<Boolean> {
 						float currentCellValue = 0.0f;
 						
 						//Variables for the loop
-						int counter = 0;
 						int arrayCellValue = 0;
 						
 						//Read all the available data on chunks
 						while (pcmDecodedInput.readNBytes(buffer, 0, BUFFER_SIZE) > 0)
-							for (int i = 0; i < buffer.length - 1; i += 2, counter += 2) {
+							for (int i = 0; i < buffer.length - 1; i += 2) {
 								
 								//Calculate the value
 								arrayCellValue = (int) ( ( ( ( ( buffer[i + 1] << 8 ) | buffer[i] & 0xff ) << 16 ) / 32767 ) * WAVEFORM_HEIGHT_COEFFICIENT );
