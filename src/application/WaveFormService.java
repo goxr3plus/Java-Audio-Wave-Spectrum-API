@@ -27,7 +27,7 @@ import ws.schild.jave.MultimediaObject;
 
 public class WaveFormService extends Service<Boolean> {
 	
-	private static final double WAVEFORM_HEIGHT_COEFFICIENT = 2.4; // This fits the waveform to the swing node height
+	private static final double WAVEFORM_HEIGHT_COEFFICIENT = 1.3; // This fits the waveform to the swing node height
 	private static final CopyOption[] options = new CopyOption[]{ COPY_ATTRIBUTES , REPLACE_EXISTING };
 	private float[] resultingWaveform;
 	private int[] wavAmplitudes;
@@ -228,99 +228,58 @@ public class WaveFormService extends Service<Boolean> {
 				//Get Audio input stream
 				try (AudioInputStream input = AudioSystem.getAudioInputStream(file)) {
 					AudioFormat baseFormat = input.getFormat();
-					int[] finalAmplitudes;
 					
+					//Encoding
 					Encoding encoding = AudioFormat.Encoding.PCM_UNSIGNED;
 					float sampleRate = baseFormat.getSampleRate();
 					int numChannels = baseFormat.getChannels();
 					
 					AudioFormat decodedFormat = new AudioFormat(encoding, sampleRate, 16, numChannels, numChannels * 2, sampleRate, false);
 					int available = input.available();
-					int[] amplitudes = new int[available];
 					
 					//Get the PCM Decoded Audio Input Stream
 					try (AudioInputStream pcmDecodedInput = AudioSystem.getAudioInputStream(decodedFormat, input)) {
 						final int BUFFER_SIZE = 4096; //this is actually bytes
-						System.out.println(available);
 						
 						//Create a buffer
 						byte[] buffer = new byte[BUFFER_SIZE];
 						
 						//Now get the average to a smaller array
 						int maximumArrayLength = 40000;
-						finalAmplitudes = new int[maximumArrayLength];
+						int[] finalAmplitudes = new int[maximumArrayLength];
 						int samplesPerPixel = available / maximumArrayLength;
-						System.out.println("Samples per pixel :" + samplesPerPixel);
 						
-						//Calculate
-						float nValue;
-						for (int w = 0; w < maximumArrayLength; w++) {
-							
-							//For performance keep it here
-							int c = w * samplesPerPixel;
-							nValue = 0.0f;
-							
-							//Keep going
-							for (int s = 0; s < samplesPerPixel; s++) {
-								nValue += Math.abs(amplitudes[c + s]);
-							}
-							
-							//Set WaveData
-							finalAmplitudes[w] = (int) nValue / samplesPerPixel;
-						}
+						//Variables to calculate finalAmplitudes array
+						int currentSampleCounter = 0;
+						int arrayCellPosition = 0;
+						float currentCellValue = 0.0f;
+						
+						//Variables for the loop
+						int counter = 0;
+						int arrayCellValue = 0;
 						
 						//Read all the available data on chunks
-						int counter = 0;
 						while (pcmDecodedInput.readNBytes(buffer, 0, BUFFER_SIZE) > 0)
 							for (int i = 0; i < buffer.length - 1; i += 2, counter += 2) {
 								
-								//Escape array out of bounds error
-								if (counter == available)
-									break;
-								
 								//Calculate the value
-								amplitudes[counter] = (int) ( ( ( ( ( buffer[i + 1] << 8 ) | buffer[i] & 0xff ) << 16 ) / 32767 ) * WAVEFORM_HEIGHT_COEFFICIENT );
+								arrayCellValue = (int) ( ( ( ( ( buffer[i + 1] << 8 ) | buffer[i] & 0xff ) << 16 ) / 32767 ) * WAVEFORM_HEIGHT_COEFFICIENT );
+								
+								//Tricker
+								if (currentSampleCounter != samplesPerPixel) {
+									++currentSampleCounter;
+									currentCellValue += Math.abs(arrayCellValue);
+								} else {
+									//Avoid ArrayIndexOutOfBoundsException
+									if (arrayCellPosition != maximumArrayLength)
+										finalAmplitudes[arrayCellPosition] = finalAmplitudes[arrayCellPosition + 1] = (int) currentCellValue / samplesPerPixel;
+									
+									//Fix the variables
+									currentSampleCounter = 0;
+									currentCellValue = 0;
+									arrayCellPosition += 2;
+								}
 							}
-						
-						//amplitudes
-						amplitudes = null;
-						
-						//						//Read all the available data on chunks
-						//						int counter = 0;
-						//						while (pcmDecodedInput.readNBytes(buffer, 0, BUFFER_SIZE) > 0)
-						//							for (int i = 0; i < buffer.length - 1; i += 2, counter += 2) {
-						//								if (counter == available)
-						//									break;
-						//								amplitudes[counter] = ( ( buffer[i + 1] << 8 ) | buffer[i] & 0xff ) << 16;
-						//								amplitudes[counter] /= 32767;
-						//								amplitudes[counter] *= WAVEFORM_HEIGHT_COEFFICIENT;
-						//							}
-						//						
-						//						//Now get the average to a smaller array
-						//						int maximumArrayLength = 40000;
-						//						finalAmplitudes = new int[maximumArrayLength];
-						//						int samplesPerPixel = available / maximumArrayLength;
-						//						System.out.println("Samples per pixel :" + samplesPerPixel);
-						//						
-						//						//Calculate
-						//						float nValue;
-						//						for (int w = 0; w < maximumArrayLength; w++) {
-						//							
-						//							//For performance keep it here
-						//							int c = w * samplesPerPixel;
-						//							nValue = 0.0f;
-						//							
-						//							//Keep going
-						//							for (int s = 0; s < samplesPerPixel; s++) {
-						//								nValue += Math.abs(amplitudes[c + s]);
-						//							}
-						//							
-						//							//Set WaveData
-						//							finalAmplitudes[w] = (int) nValue / samplesPerPixel;
-						//						}
-						//						
-						//						//amplitudes
-						//						amplitudes = null;
 						
 						return finalAmplitudes;
 					} catch (Exception ex) {
