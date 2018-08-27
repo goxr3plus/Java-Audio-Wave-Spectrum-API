@@ -149,11 +149,13 @@ public class BoxWaveform {
 		float[] samples;
 		
 		//Convert to .wav if not ..... ;) be madafucka gangster
-		File newFile = new File("lilfucka.wav");
+		File temporalDecodedFile = null;
 		if (! ( "wav".equalsIgnoreCase(getFileTitle(file.getAbsolutePath())) )) {
 			//Transcoding to wav
 			try {
-				transcodeToWav(file, newFile);
+				temporalDecodedFile = File.createTempFile("decoded_audio", ".wav");
+				transcodeToWav(file, temporalDecodedFile);
+				temporalDecodedFile.deleteOnExit();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Fatal exception exiting....");
@@ -163,7 +165,7 @@ public class BoxWaveform {
 		
 		//Now procceeed orgasm...
 		try {
-			AudioInputStream in = AudioSystem.getAudioInputStream(newFile);
+			AudioInputStream in = AudioSystem.getAudioInputStream(temporalDecodedFile);
 			AudioFormat fmt = in.getFormat();
 			
 			if (fmt.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
@@ -224,6 +226,8 @@ public class BoxWaveform {
 			
 		} catch (Exception e) {
 			problem(e);
+			temporalDecodedFile.delete();
+			temporalDecodedFile.deleteOnExit();
 			return;
 		}
 		
@@ -232,6 +236,10 @@ public class BoxWaveform {
 		}
 		
 		drawImage(samples);
+		
+		//Delete the temporary file
+		temporalDecodedFile.delete();
+		temporalDecodedFile.deleteOnExit();
 	}
 	
 	static void problem(Object msg) {
