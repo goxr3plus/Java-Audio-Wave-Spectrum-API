@@ -55,27 +55,14 @@
 	<dependencies>
 		<!-- JAVE2 -->
 		<dependency>
-			<groupId>com.github.GOXR3PLUS-STUDIO.jave2</groupId>
-			<artifactId>jave-all-deps</artifactId>
-			<version>2.4.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.github.GOXR3PLUS-STUDIO.jave2</groupId>
-					<artifactId>jave-native-win32</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.github.GOXR3PLUS-STUDIO.jave2</groupId>
-					<artifactId>jave-native-linux32</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.github.GOXR3PLUS-STUDIO.jave2</groupId>
-					<artifactId>jave-native-linux64</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.github.GOXR3PLUS-STUDIO.jave2</groupId>
-					<artifactId>jave-native-osx64</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>ws.schild</groupId>
+			<artifactId>jave-native-win64</artifactId>
+			<version>2.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>ws.schild</groupId>
+			<artifactId>jave-core</artifactId>
+			<version>2.4.2</version>
 		</dependency>
 	</dependencies>
 </project>
