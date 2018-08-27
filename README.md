@@ -23,6 +23,7 @@ How this works ?
 
 This library produces the below exactly :
 ![image](https://github.com/goxr3plus/Java-Audio-Wave-Spectrum-API/blob/master/images/Screenshot_2.jpg?raw=true)
+![image](https://github.com/goxr3plus/Java-Audio-Wave-Spectrum-API/blob/master/images/soundcloud.jpg?raw=true)
 
 You can see it working live on [XR3Player](https://github.com/goxr3plus/XR3Player) :
 
