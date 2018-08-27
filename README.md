@@ -1,6 +1,15 @@
 # Java-Audio-Wave-Spectrum-API
 Create Wave Spectrum from any Audio File using this API , written in JavaFX
 
+How this works ?
+
+1) We convert the given audio if not to **.wav** using **Jave2** library
+2) We get the **.wav amplitudes** in a beautiful smart way
+3) Based on the given **width of the canvas we draw the wave**
+4) On every change of width re-calculate the wave and redraw
+5) Run the code and see the magic happen :)
+6) Download [XR3Player](https://github.com/goxr3plus/XR3Player) and see more magic like this 
+
 ## Supported Operating Systems
 
 | Operating System | Windows x32,x64 | MacOS x32,x64 | Linux x32,x64 |
