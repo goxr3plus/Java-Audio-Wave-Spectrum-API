@@ -23,6 +23,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.apache.commons.io.FilenameUtils;
+
+import ws.schild.jave.AudioAttributes;
+import ws.schild.jave.Encoder;
+import ws.schild.jave.EncoderException;
+import ws.schild.jave.EncodingAttributes;
+import ws.schild.jave.MultimediaObject;
+
 public class BoxWaveform {
 	static int boxWidth = 4;
 	static Dimension size = new Dimension(boxWidth == 1 ? 512 : 513, 97);
@@ -92,8 +100,45 @@ public class BoxWaveform {
 		view.requestFocus();
 	}
 	
+	/**
+	 * Transcode to Wav
+	 * 
+	 * @param sourceFile
+	 * @param destinationFile
+	 * @throws EncoderException
+	 */
+	private static void transcodeToWav(File sourceFile , File destinationFile) throws Exception {
+		//Attributes atters = DefaultAttributes.WAV_PCM_S16LE_STEREO_44KHZ.getAttributes()
+		
+		//Set Audio Attributes
+		AudioAttributes audio = new AudioAttributes();
+		audio.setCodec("pcm_s16le");
+		audio.setChannels(2);
+		audio.setSamplingRate(44100);
+		
+		//Set encoding attributes
+		EncodingAttributes attributes = new EncodingAttributes();
+		attributes.setFormat("wav");
+		attributes.setAudioAttributes(audio);
+		
+		//Encode		s
+		new Encoder().encode(new MultimediaObject(sourceFile), destinationFile, attributes);
+		
+	}
+	
+	/**
+	 * Returns the title of the file for example if file name is <b>(club.mp3)</b> it returns <b>(club)</b>
+	 *
+	 * @param absolutePath
+	 *            The File absolute path
+	 * @return the File title
+	 */
+	public static String getFileTitle(String absolutePath) {
+		return FilenameUtils.getBaseName(absolutePath);
+	}
+	
 	// handle most WAV and AIFF files
-	static void loadImage() {
+	public static void loadImage() {
 		JFileChooser chooser = new JFileChooser();
 		int val = chooser.showOpenDialog(null);
 		if (val != JFileChooser.APPROVE_OPTION) {
@@ -103,8 +148,22 @@ public class BoxWaveform {
 		File file = chooser.getSelectedFile();
 		float[] samples;
 		
+		//Convert to .wav if not ..... ;) be madafucka gangster
+		File newFile = new File("lilfucka.wav");
+		if (! ( "wav".equalsIgnoreCase(getFileTitle(file.getAbsolutePath())) )) {
+			//Transcoding to wav
+			try {
+				transcodeToWav(file, newFile);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("Fatal exception exiting....");
+				System.exit(0);
+			}
+		}
+		
+		//Now procceeed orgasm...
 		try {
-			AudioInputStream in = AudioSystem.getAudioInputStream(file);
+			AudioInputStream in = AudioSystem.getAudioInputStream(newFile);
 			AudioFormat fmt = in.getFormat();
 			
 			if (fmt.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
